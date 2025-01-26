@@ -1,40 +1,51 @@
 package org.example;
+
 import java.util.Scanner;
+
 public class Main {
     private static final String[] birlik = {"", "bir", "ikki", "uch", "to'rt", "besh", "olti", "yetti", "sakkiz", "to'qqiz"};
     private static final String[] onlik = {"", "o'n", "yigirma", "o'ttiz", "qirq", "ellik", "oltmish", "yetmish", "sakson", "to'qson"};
     private static final String yuzlik = "yuz";
-    private static final String[] minglik = {"", "ming", "million", "milliard", "trillion", "kvadrilon", "kvintilion"};
+    private static final String[] minglik = {"", "ming", "million", "milliard", "trillion", "kvadrilyon", "kvintilyon"};
+
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
         System.out.print("Sonni kiriting: ");
-        String inputNumber = scanner.nextLine();
+        String inputNumber = scanner.nextLine().trim();
 
-        String outputString = convert(inputNumber);
-        System.out.println(outputString);
+        try {
+            if (inputNumber.startsWith("-")) {
+                System.out.println("Minus " + convert(inputNumber.substring(1)));
+            } else if (inputNumber.equals("0")) {
+                System.out.println("nol");
+            } else {
+                System.out.println(convert(inputNumber));
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Noto'g'ri formatda son kiritildi.");
+        }
 
         scanner.close();
     }
 
     private static String uchXona(String number) {
-        int count = number.length();
+        int num = Integer.parseInt(number); // Kichik bo'limni raqam sifatida o'qish
+        if (num == 0) return ""; // Agar faqat nol bo'lsa, bo'sh qaytariladi
+
         StringBuilder result = new StringBuilder();
-
-        // Yuzliklar
-        if (count >= 3 && number.charAt(count - 3) != '0') {
-            result.append(birlik[number.charAt(count - 3) - '0']).append(" ").append(yuzlik).append(" ");
+        if (number.length() == 3 && number.charAt(0) != '0') {
+            result.append(birlik[number.charAt(0) - '0']).append(" ").append(yuzlik).append(" ");
         }
 
-        // O'nliklar
-        if (count >= 2 && number.charAt(count - 2) != '0') {
-            result.append(onlik[number.charAt(count - 2) - '0']).append(" ");
+        if (number.length() >= 2 && number.charAt(number.length() - 2) != '0') {
+            result.append(onlik[number.charAt(number.length() - 2) - '0']).append(" ");
         }
 
-        // Birliklar
-        if (number.charAt(count - 1) != '0') {
-            result.append(birlik[number.charAt(count - 1) - '0']);
+        if (number.charAt(number.length() - 1) != '0') {
+            result.append(birlik[number.charAt(number.length() - 1) - '0']);
         }
+
         return result.toString().trim();
     }
 
@@ -46,10 +57,13 @@ public class Main {
         while (length > 0) {
             String uchlik = number.substring(Math.max(0, length - 3), length);
             if (!uchlik.equals("000")) {
-                if (i > 0) {
-                    result.append(" ").append(minglik[i]);
+                String uchXonaText = uchXona(uchlik);
+                if (!uchXonaText.isEmpty()) {
+                    if (i > 0) {
+                        result.insert(0, minglik[i] + " ");
+                    }
+                    result.insert(0, uchXonaText + " ");
                 }
-                result.append(" ").append(uchXona(uchlik));
             }
             length -= 3;
             i++;
